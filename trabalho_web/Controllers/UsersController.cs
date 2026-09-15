@@ -4,20 +4,29 @@ using trabalho_web.Models;
 
 namespace trabalho_web.Controllers
 {
-
     [ApiController]
     [Route("[controller]")]
     public class UsersController(IUserService service) : ControllerBase
     {
-
         [HttpPost(Name = "Create")]
-        public IActionResult Post([FromBody] CreateUserDto createUserDto)
+        public async Task<IActionResult> Post([FromBody] CreateUserDto createUserDto)
         {
-           var res  =  service.CreateUserAsync(createUserDto);
+           
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(ModelState);
+            }
 
-            return Ok();
+            
+            var result = await service.CreateUserAsync(createUserDto);
+
+
+            if (result.Contains("sucesso"))
+            {
+                return Ok(new { message = result });
+            }
+
+            return BadRequest(new { error = result });
         }
-
-
     }
 }
