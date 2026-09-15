@@ -6,5 +6,7 @@ namespace trabalho_web.Interfaces.Services
     {
 
         Task<string> CreateUserAsync(CreateUserDto createUserDto);
+
+        Task<List<UserDto>> GetUsers();
     }
 }

@@ -29,6 +29,27 @@ namespace trabalho_web.Controllers
             return BadRequest(new { error = result });
         }
 
+        [HttpGet(Name = "GetAll")]
+        public async Task<IActionResult> GetAll()
+        {
+
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(ModelState);
+            }
+
+
+            var result = await service.CreateUserAsync(createUserDto);
+
+
+            if (result.Contains("sucesso"))
+            {
+                return Ok(new { message = result });
+            }
+
+            return BadRequest(new { error = result });
+        }
+
 
 
     }
