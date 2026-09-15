@@ -31,7 +31,7 @@ namespace trabalho_web.Services
                 new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString())
             };
 
-            var expiryMinutes = Convert.ToDouble(jwtSettings["ExpiryMinutes"] ?? "60");
+            var expiryMinutes = Convert.ToDouble(jwtSettings["ExpiryMinutes"] ?? "120");
 
             var token = new JwtSecurityToken(
                 issuer: jwtSettings["Issuer"],
