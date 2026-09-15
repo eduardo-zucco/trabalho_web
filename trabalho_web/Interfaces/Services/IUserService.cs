@@ -8,5 +8,9 @@ namespace trabalho_web.Interfaces.Services
         Task<UserResponseDto> CreateUserAsync(CreateUserDto createUserDto);
 
         Task<List<UserDto>> GetUsers();
+
+        Task<bool> DeleteUserAsync(int id);
+
+        Task<UserResponseDto> LoginAsync(LoginDto loginDto);
     }
 }

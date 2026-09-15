@@ -11,46 +11,46 @@ namespace trabalho_web.Services
         {
             if (createUserDto == null || string.IsNullOrWhiteSpace(createUserDto.Email) || string.IsNullOrWhiteSpace(createUserDto.Password))
             {
-                throw new ArgumentException("Dados do usuário inválidos.");
+                throw new ArgumentException("Dados do usuário são obrigatórios.");
             }
 
-            try
+            bool isDuplicate = await context.Users.AnyAsync(t => t.Email == createUserDto.Email);
+
+            if (isDuplicate)
             {
-                bool isDuplicate = await context.Users.AnyAsync(t => t.Email == createUserDto.Email);
-
-                if (isDuplicate)
-                {
-                    throw new InvalidOperationException("Email já está em uso, tente novamente!");
-                }
-
-                var passwordHash = PasswordHasher.HashPassword(createUserDto.Password);
-                UserEntity newUser = new UserEntity(createUserDto.UserName, createUserDto.Email, passwordHash);
-
-                context.Users.Add(newUser);
-                await context.SaveChangesAsync();
-
-                var token = jwtService.GenerateToken(newUser.Id, newUser.Name);
-
-                return new UserResponseDto
-                {
-                    Id = newUser.Id,
-                    Name = newUser.Name,
-                    Email = newUser.Email,
-                    Token = token
-                };
+                throw new InvalidOperationException("E-mail já está em uso, tente novamente!");
             }
-            catch (InvalidOperationException)
+
+            var passwordHash = PasswordHasher.HashPassword(createUserDto.Password);
+            UserEntity newUser = new UserEntity(createUserDto.UserName, createUserDto.Email, passwordHash);
+
+            context.Users.Add(newUser);
+            await context.SaveChangesAsync();
+
+            var token = jwtService.GenerateToken(newUser.Id, newUser.Name);
+
+            return new UserResponseDto
             {
-                throw;
-            }
-            catch (ArgumentException)
+                Id = newUser.Id,
+                Name = newUser.Name,
+                Email = newUser.Email,
+                Token = token
+            };
+        }
+
+        public async Task<bool> DeleteUserAsync(int id)
+        {
+            var user = await context.Users.FindAsync(id);
+
+            if (user == null)
             {
-                throw;
+                throw new KeyNotFoundException("Usuário não encontrado.");
             }
-            catch (Exception ex)
-            {
-                throw new Exception("Erro ao processar a criação do usuário.", ex);
-            }
+
+            context.Users.Remove(user);
+            await context.SaveChangesAsync();
+
+            return true;
         }
 
         public async Task<List<UserDto>> GetUsers()
@@ -58,11 +58,36 @@ namespace trabalho_web.Services
             return await context.Users
                 .Select(u => new UserDto
                 {
-                    Id = u.Id.ToString(),
+                    Id = u.Id,
                     Name = u.Name,
                     Email = u.Email
                 })
                 .ToListAsync();
+        }
+
+        public async Task<UserResponseDto> LoginAsync(LoginDto loginDto)
+        {
+            if (loginDto == null || string.IsNullOrWhiteSpace(loginDto.Email) || string.IsNullOrWhiteSpace(loginDto.Password))
+            {
+                throw new ArgumentException("E-mail e senha são obrigatórios.");
+            }
+
+            var user = await context.Users.FirstOrDefaultAsync(t => t.Email == loginDto.Email);
+
+            if (user == null || !PasswordHasher.VerifyPassword(loginDto.Password, user.Password))
+            {
+                throw new UnauthorizedAccessException("E-mail ou senha inválidos.");
+            }
+
+            var token = jwtService.GenerateToken(user.Id, user.Name);
+
+            return new UserResponseDto
+            {
+                Id = user.Id,
+                Name = user.Name,
+                Email = user.Email,
+                Token = token
+            };
         }
     }
 }
