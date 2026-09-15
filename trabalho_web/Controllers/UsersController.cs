@@ -28,5 +28,8 @@ namespace trabalho_web.Controllers
 
             return BadRequest(new { error = result });
         }
+
+
+
     }
 }
