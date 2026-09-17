@@ -17,14 +17,5 @@
         }
 
 
-
-        public string Hash (string hash)
-        {
-            return hash;
-        }
-
-
-
-
     }
 }

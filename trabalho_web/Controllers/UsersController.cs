@@ -6,21 +6,21 @@ using trabalho_web.Models;
 namespace trabalho_web.Controllers
 {
     [ApiController]
-    [Route("[controller]")]
+    [Route("api/[controller]")]
     public class UsersController(IUserService service) : ControllerBase
     {
         [HttpPost("register")]
         public async Task<IActionResult> Post([FromBody] CreateUserDto createUserDto)
         {
             var result = await service.CreateUserAsync(createUserDto);
-            return StatusCode(201, ApiResponse<UserResponseDto>.Ok(result, "Usuário criado com sucesso!"));
+            return Created($"/api/users/{result.Id}", ApiResponse<UserResponseDto>.Ok(result, "Usuário criado com sucesso!"));
         }
 
         [Authorize]
         [HttpGet]
         public async Task<IActionResult> GetAll()
         {
-            var result = await service.GetUsers();
+            var result = await service.GetUsersAsync();
             return Ok(ApiResponse<List<UserDto>>.Ok(result, "Lista de usuários obtida com sucesso."));
         }
 

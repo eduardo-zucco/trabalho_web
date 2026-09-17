@@ -9,7 +9,7 @@ namespace trabalho_web.Services
     {
         public async Task<UserResponseDto> CreateUserAsync(CreateUserDto createUserDto)
         {
-            if (createUserDto == null || string.IsNullOrWhiteSpace(createUserDto.Email) || string.IsNullOrWhiteSpace(createUserDto.Password))
+            if (createUserDto == null || string.IsNullOrWhiteSpace(createUserDto.Email) || string.IsNullOrWhiteSpace(createUserDto.Password) || string.IsNullOrWhiteSpace(createUserDto.UserName))
             {
                 throw new ArgumentException("Dados do usuário são obrigatórios.");
             }
@@ -38,7 +38,7 @@ namespace trabalho_web.Services
             };
         }
 
-        public async Task<bool> DeleteUserAsync(int id)
+        public async Task DeleteUserAsync(int id)
         {
             var user = await context.Users.FindAsync(id);
 
@@ -49,11 +49,9 @@ namespace trabalho_web.Services
 
             context.Users.Remove(user);
             await context.SaveChangesAsync();
-
-            return true;
         }
 
-        public async Task<List<UserDto>> GetUsers()
+        public async Task<List<UserDto>> GetUsersAsync()
         {
             return await context.Users
                 .Select(u => new UserDto
