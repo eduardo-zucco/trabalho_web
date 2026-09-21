@@ -63,6 +63,62 @@ namespace trabalho_web.Services
                 .ToListAsync();
         }
 
+        public async Task<UserDto> GetUserByIdAsync(int id)
+        {
+            var user = await context.Users.FindAsync(id);
+
+            if (user == null)
+            {
+                throw new KeyNotFoundException("Usuário não encontrado.");
+            }
+
+            return new UserDto
+            {
+                Id = user.Id,
+                Name = user.Name,
+                Email = user.Email
+            };
+        }
+
+        public async Task<UserDto> UpdateUserAsync(int id, UpdateUserDto updateUserDto)
+        {
+            if (updateUserDto == null || string.IsNullOrWhiteSpace(updateUserDto.Email) || string.IsNullOrWhiteSpace(updateUserDto.UserName))
+            {
+                throw new ArgumentException("Dados do usuário são obrigatórios.");
+            }
+
+            var user = await context.Users.FindAsync(id);
+
+            if (user == null)
+            {
+                throw new KeyNotFoundException("Usuário não encontrado.");
+            }
+
+            bool isEmailDuplicate = await context.Users.AnyAsync(u => u.Email == updateUserDto.Email && u.Id != id);
+
+            if (isEmailDuplicate)
+            {
+                throw new InvalidOperationException("E-mail já está em uso por outro usuário.");
+            }
+
+            user.Name = updateUserDto.UserName;
+            user.Email = updateUserDto.Email;
+
+            if (!string.IsNullOrWhiteSpace(updateUserDto.Password))
+            {
+                user.Password = PasswordHasher.HashPassword(updateUserDto.Password);
+            }
+
+            await context.SaveChangesAsync();
+
+            return new UserDto
+            {
+                Id = user.Id,
+                Name = user.Name,
+                Email = user.Email
+            };
+        }
+
         public async Task<UserResponseDto> LoginAsync(LoginDto loginDto)
         {
             if (loginDto == null || string.IsNullOrWhiteSpace(loginDto.Email) || string.IsNullOrWhiteSpace(loginDto.Password))

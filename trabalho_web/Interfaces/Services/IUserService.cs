@@ -9,6 +9,10 @@ namespace trabalho_web.Interfaces.Services
 
         Task<List<UserDto>> GetUsersAsync();
 
+        Task<UserDto> GetUserByIdAsync(int id);
+
+        Task<UserDto> UpdateUserAsync(int id, UpdateUserDto updateUserDto);
+
         Task DeleteUserAsync(int id);
 
         Task<UserResponseDto> LoginAsync(LoginDto loginDto);

@@ -32,6 +32,22 @@ namespace trabalho_web.Controllers
         }
 
 
+        [Authorize]
+        [HttpGet("{id}")]
+        public async Task<IActionResult> GetById(int id)
+        {
+            var result = await service.GetUserByIdAsync(id);
+            return Ok(ApiResponse<UserDto>.Ok(result, "Usuário obtido com sucesso."));
+        }
+
+        [Authorize]
+        [HttpPut("{id}")]
+        public async Task<IActionResult> Update(int id, [FromBody] UpdateUserDto updateUserDto)
+        {
+            var result = await service.UpdateUserAsync(id, updateUserDto);
+            return Ok(ApiResponse<UserDto>.Ok(result, "Usuário atualizado com sucesso!"));
+        }
+
         [Authorize] 
         [HttpDelete("{id}")]
         public async Task<IActionResult> Delete(int id)
